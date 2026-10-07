@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر الكروت والتطبيقات الرقمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #10b981;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --gold: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Card List */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; left: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin: 8px 0;
+        }
+
+        .stock-badge {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .btn-buy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-buy:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Payment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .card-info-box {
+            background: #0f172a;
+            border: 1px dashed var(--gold);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .card-number {
+            font-size: 1.25rem;
+            font-family: monospace;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin: 8px 0;
+            user-select: all;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Success Card */
+        .delivery-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .code-display {
+            font-size: 1.3rem;
+            font-family: monospace;
+            background: #000;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            word-break: break-all;
+            border: 1px solid var(--accent);
+        }
+
+        .apk-btn {
+            background: var(--accent);
+            color: #000;
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Admin panel styling */
+        .admin-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">⚡ متجر الأكواد الرقمية</div>
+        <div style="font-size: 0.85rem;">حالة المتجر: <span style="color:var(--accent); font-weight: bold;">مباشر ✅</span></div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation Buttons -->
+        <div class="nav-tabs">
+            <div class="nav-btn active" onclick="switchSection('store')">🛍️ المتجر</div>
+            <div class="nav-btn" onclick="switchSection('admin')">⚙️ لوحة الأدمن</div>
+        </div>
+
+        <!-- 1. Store Front -->
+        <div id="store" class="section active">
+            <h3 style="margin-bottom:15px; font-weight: 700;">اختر باقة الكود المطلوبة:</h3>
+            <div class="products-grid" id="productsList">
+                <!-- Populated Dynamically -->
+            </div>
+        </div>
+
+        <!-- 2. Admin Section -->
+        <div id="admin" class="section">
+            <div id="adminLogin">
+                <div class="admin-box" style="text-align:center;">
+                    <h3>🔐 تسجيل دخول لوحة التحكم</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin: 8px 0 15px 0;">أدخل كلمة السر الخاصة بالإدارة للوصول</p>
+                    <div class="input-group">
+                        <input type="password" id="adminPasswordInput" placeholder="كلمة السر...">
+                    </div>
+                    <button class="btn-buy" onclick="loginAdmin()">تسجيل الدخول</button>
+                </div>
+            </div>
+
+            <div id="adminPanel" style="display:none;">
+                <div class="admin-box" style="border-color:var(--accent);">
+                    <h3>⚙️ لوحة تحكم الإدارة</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top: 4px;">يمكنك التحكم بالأسعار، الماستر كارد، والمخزون بشكل كامل.</p>
+                    <button onclick="logoutAdmin()" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; margin-top:10px; cursor:pointer; font-weight: bold;">تسجيل الخروج</button>
+                </div>
+
+                <!-- 1. Master Card Edit -->
+                <div class="admin-box">
+                    <h4>💳 تعديل بيانات الماستر كارد</h4>
+                    <div class="input-group" style="margin-top:10px;">
+                        <label>اسم صاحب الحساب:</label>
+                        <input type="text" id="adminCardName">
+                    </div>
+                    <div class="input-group">
+                        <label>رقم الماستر كارد:</label>
+                        <input type="text" id="adminCardNumber">
+                    </div>
+                    <button class="btn-buy" onclick="saveCardInfo()">حفظ بيانات الماستر كارد</button>
+                </div>
+
+                <!-- 2. Link APK Edit -->
+                <div class="admin-box">
+                    <h4>📱 تعديل رابط تطبيق الـ APK</h4>
+                    <div class="input-group" style="margin-top:10px;">
+                        <label>رابط تحميل الـ APK:</label>
+                        <input type="text" id="adminApkUrl">
+                    </div>
+                    <button class="btn-buy" onclick="saveApkUrl()">حفظ رابط التطبيق</button>
+                </div>
+
+                <!-- 3. Add Codes Stock -->
+                <div class="admin-box">
+                    <h4>🔑 شحن الأكواد إلى المخزن</h4>
+                    <div class="input-group" style="margin-top:10px;">
+                        <label>اختر الباقة:</label>
+                        <select id="adminProductSelect"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>أدخل الأكواد (كود واحد في كل سطر):</label>
+                        <textarea id="adminCodesList" rows="4"></textarea>
+                    </div>
+                    <button class="btn-buy" onclick="addStockCodes()">إضافة الأكواد للمخزن</button>
+                </div>
+
+                <!-- 4. Manage Admins -->
+                <div class="admin-box">
+                    <h4>👥 إضافة أدمن ثاني (كلمة سر إضافية)</h4>
+                    <div class="input-group" style="margin-top:10px;">
+                        <label>أدخل كلمة سر للأدمن الجديد:</label>
+                        <input type="password" id="newAdminPassword" placeholder="كلمة سر جديدة">
+                    </div>
+                    <button class="btn-buy" onclick="addAdminPassword()">إضافة الأدمن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Purchase Step -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">تأكيد الشراء والتحويل</h3>
+            <p id="modalPrice" style="color:var(--gold); font-weight:bold; margin-top:5px; font-size: 1.1rem;"></p>
+
+            <div class="card-info-box">
+                <div style="font-size:0.85rem; color:var(--text-muted);">حوّل المبلغ إلى حساب الماستر كارد التالي:</div>
+                <div class="card-number" id="displayCardNumber">0000 0000 0000 0000</div>
+                <div style="font-size:0.9rem;" id="displayCardName">اسم الحساب: ---</div>
+            </div>
+
+            <div id="deliveryArea" style="display:none;" class="delivery-card">
+                <h4>✅ تم التحويل واستلام الكود بنجاح!</h4>
+                <div class="code-display" id="retrievedCode">XXXX-XXXX-XXXX</div>
+                <p style="font-size:0.85rem; margin-top:5px;">حمل نسخة التطبيق (APK) المباشرة من الرابط:</p>
+                <a href="#" id="apkDownloadLink" target="_blank" class="apk-btn">📥 تحميل تطبيق APK</a>
+            </div>
+
+            <div id="modalButtons" style="margin-top:15px;">
+                <button class="btn-buy" onclick="processImmediatePurchase()">تأكيد التحويل واستلام الكود فوراً</button>
+                <button class="btn-buy" style="background:transparent; border:1px solid var(--border); margin-top:8px; color: var(--text-muted);" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultState = {
+            cardName: "Hussein Al-Master",
+            cardNumber: "5358 9200 1122 4455",
+            apkUrl: "https://example.com/app-release.apk",
+            adminPasswords: ["hsen2222"],
+            products: [
+                { id: "p5", name: "كود 5 أيام", price: 3, codes: ["CODE5D-8821", "CODE5D-9032", "CODE5D-1102"] },
+                { id: "p10", name: "كود 10 أيام", price: 5, codes: ["CODE10D-5501", "CODE10D-3321"] },
+                { id: "p15", name: "كود 15 يوم", price: 7, codes: ["CODE15D-7701", "CODE15D-9981"] },
+                { id: "p30", name: "كود 30 يوم", price: 10, codes: ["CODE30D-0001", "CODE30D-0002", "CODE30D-0003"] }
+            ]
+        };
+
+        function getDB() {
+            const data = localStorage.getItem('store_db_encrypted');
+            return data ? JSON.parse(data) : defaultState;
+        }
+
+        function saveDB(db) {
+            localStorage.setItem('store_db_encrypted', JSON.stringify(db));
+            renderProducts();
+        }
+
+        let selectedProductId = null;
+
+        function switchSection(secId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(secId).classList.add('active');
+            
+            if(secId === 'store') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            if(secId === 'admin') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+        }
+
+        function renderProducts() {
+            const db = getDB();
+            const grid = document.getElementById('productsList');
+            const select = document.getElementById('adminProductSelect');
+            grid.innerHTML = '';
+            select.innerHTML = '';
+
+            db.products.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price">$${p.price}</div>
+                        <div class="stock-badge">المتبقي: ${p.codes.length} كود</div>
+                        <button class="btn-buy" onclick="openPayment('${p.id}')">شراء الآن</button>
+                    </div>
+                `;
+
+                select.innerHTML += `<option value="${p.id}">${p.name} ($${p.price})</option>`;
+            });
+
+            document.getElementById('adminCardName').value = db.cardName;
+            document.getElementById('adminCardNumber').value = db.cardNumber;
+            document.getElementById('adminApkUrl').value = db.apkUrl;
+        }
+
+        function openPayment(productId) {
+            const db = getDB();
+            selectedProductId = productId;
+            const product = db.products.find(p => p.id === productId);
+
+            if (product.codes.length === 0) {
+                alert('عذراً! الكود نفد من المخزن حالياً.');
+                return;
+            }
+
+            document.getElementById('modalTitle').innerText = 'شراء: ' + product.name;
+            document.getElementById('modalPrice').innerText = 'السعر: $' + product.price;
+            document.getElementById('displayCardName').innerText = 'اسم الحساب: ' + db.cardName;
+            document.getElementById('displayCardNumber').innerText = db.cardNumber;
+
+            document.getElementById('deliveryArea').style.display = 'none';
+            document.getElementById('modalButtons').style.display = 'block';
+
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processImmediatePurchase() {
+            const db = getDB();
+            const product = db.products.find(p => p.id === selectedProductId);
+
+            if (product.codes.length > 0) {
+                const codeToGive = product.codes.shift();
+                saveDB(db);
+
+                document.getElementById('retrievedCode').innerText = codeToGive;
+                document.getElementById('apkDownloadLink').href = db.apkUrl;
+
+                document.getElementById('deliveryArea').style.display = 'block';
+                document.getElementById('modalButtons').innerHTML = '<button class="btn-buy" onclick="closeModal()">إغلاق الشاشة</button>';
+            }
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            const db = getDB();
+
+            if (db.adminPasswords.includes(pass)) {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+            } else {
+                alert('كلمة السر غير صحيحة!');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPasswordInput').value = '';
+        }
+
+        function saveCardInfo() {
+            const db = getDB();
+            db.cardName = document.getElementById('adminCardName').value;
+            db.cardNumber = document.getElementById('adminCardNumber').value;
+            saveDB(db);
+            alert('تم حفظ بيانات الماستر كارد بنجاح!');
+        }
+
+        function saveApkUrl() {
+            const db = getDB();
+            db.apkUrl = document.getElementById('adminApkUrl').value;
+            saveDB(db);
+            alert('تم حفظ رابط الـ APK بنجاح!');
+        }
+
+        function addStockCodes() {
+            const db = getDB();
+            const prodId = document.getElementById('adminProductSelect').value;
+            const text = document.getElementById('adminCodesList').value.trim();
+
+            if (!text) return alert('يرجى كتابة الكروت أولاً');
+
+            const newCodes = text.split('\n').map(c => c.trim()).filter(c => c.length > 0);
+            const product = db.products.find(p => p.id === prodId);
+
+            product.codes.push(...newCodes);
+            saveDB(db);
+
+            document.getElementById('adminCodesList').value = '';
+            alert(`تمت إضافة ${newCodes.length} كود بنجاح لمخزن ${product.name}!`);
+        }
+
+        function addAdminPassword() {
+            const newPass = document.getElementById('newAdminPassword').value.trim();
+            if (!newPass) return alert('أدخل كلمة السر الجديدة أولاً');
+
+            const db = getDB();
+            if (!db.adminPasswords.includes(newPass)) {
+                db.adminPasswords.push(newPass);
+                saveDB(db);
+                alert('تمت إضافة كل
